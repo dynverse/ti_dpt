@@ -1,5 +1,6 @@
 id: dpt
 docker_repository: dynverse/ti_dpt
+singularity_collection: 1541
 container_url: https://github.com/dynverse/ti_dpt
 name: DPT
 type: algorithm
