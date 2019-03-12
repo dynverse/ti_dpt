@@ -1,23 +1,50 @@
-id: dpt
-docker_repository: dynverse/ti_dpt
-singularity_collection: 1541
-container_url: https://github.com/dynverse/ti_dpt
-name: DPT
-source: tool
-doi: 10.1038/nmeth.3971
-google_scholar_cluster_id: '13227754795988844195'
-platform: R
-trajectory_types:
-- bifurcation
-- convergence
-topology_inference: fixed
-license: GPL-3
-preprint_date: '2016-02-08'
-publication_date: '2016-08-29'
-code_url: https://bioconductor.org/packages/release/bioc/html/destiny.html
+method:
+  id: dpt
+  name: DPT
+  source: tool
+  platform: R
+  url: https://bioconductor.org/packages/release/bioc/html/destiny.html
+  license: GPL-3
+  authors:
+  - given: Laleh
+    family: Haghverdi
+    email: eh@ebi.ac.uk
+  - given: Philipp
+    family: Angerer
+    email: philipp.angerer@helmholtz-muenchen.de
+    ORCID: 0000-0002-0369-2888
+    github: flying-sheep
+  - given: Fabian
+    family: Theis
+    email: fabian.theis@helmholtz-muenchen.de
+    github: theislab
+    ORCID: 0000-0002-2419-1943
+
+manuscript:
+  doi: 10.1038/nmeth.3971
+  google_scholar_cluster_id: '13227754795988844195'
+  preprint_date: '2016-02-08'
+  publication_date: '2016-08-29'
+
+container:
+  url: https://github.com/dynverse/ti_dpt
+  docker: dynverse/ti_dpt
+
+wrapper:
+  type: trajectory
+  topology_inference: fixed
+  trajectory_types:
+  - bifurcation
+  - convergence
+  example: /code/example.R
+  input_required: expression
+  input_optional:
+  - start_id
+  - features_id
+
 parameters:
-  sigma:
-    type: discrete
+  - id: sigma
+    type: character
     default: local
     values:
     - local
@@ -29,8 +56,8 @@ parameters:
       \item a numeric global sigma -- a global sigma will be calculated using \code{\link[destiny:find_sigmas]{destiny::find_sigmas()}}
       \item or a \code{\link[destiny:Sigmas-class]{destiny::Sigmas-class()}} object.
       }
-  distance:
-    type: discrete
+  - id: distance
+    type: character
     default: euclidean
     values:
     - euclidean
@@ -43,62 +70,39 @@ parameters:
       \item cosine distance (1-corr(c_1, c_2)), or
       \item rank correlation distance (1-corr(rank(c_1), rank(c_2)))
       }
-  ndim:
+  - id: ndim
     type: integer
     default: 20
-    upper: 100
-    lower: 3
+    distribution:
+      type: uniform
+      lower: 3
+      upper: 100
     description: Number of eigenvectors/dimensions to return
-  density_norm:
+  - id: density_norm
     type: logical
     default: yes
     description: logical. If TRUE, use density normalisation
-  n_local_lower:
-    type: integer
-    default: 5
-    upper: 20
-    lower: 2
-    description: If sigma == 'local', the \code{n_local_lower}:\code{n_local_upper}
+  - id: n_local
+    description: If sigma == 'local', the \code{n_local}
       nearest neighbor(s) determine(s) the local sigma
-  n_local_upper:
-    type: integer
-    default: 7
-    upper: 20
-    lower: 2
-    description: See \code{n_local_lower}
-  w_width:
+    type: range
+    default:
+    - 5
+    - 7
+    as_integer: TRUE
+    lower_distribution:
+      type: uniform
+      lower: 2
+      upper: 20
+    upper_distribution:
+      type: uniform
+      lower: 2
+      upper: 20
+  - id: w_width
     type: numeric
     default: 0.1
-    upper: 1.0
-    lower: 0.0001
-    distribution: expuniform
+    distribution: 
+      type: expuniform
+      lower: 0.0001
+      upper: 1
     description: Window width to use for deciding the branch cutoff
-  forbidden: n_local_lower > n_local_upper
-input:
-  format: rds
-  optional:
-  - start_id
-  - features_id
-  required: expression
-output:
-  format: rds
-  outputs:
-  - trajectory
-  - grouping
-  - dimred
-  - timings
-wrapper_type: trajectory
-authors:
-- given: Laleh
-  family: Haghverdi
-  email: eh@ebi.ac.uk
-- given: Philipp
-  family: Angerer
-  email: philipp.angerer@helmholtz-muenchen.de
-  ORCID: 0000-0002-0369-2888
-  github: flying-sheep
-- given: Fabian
-  family: Theis
-  email: fabian.theis@helmholtz-muenchen.de
-  github: theislab
-  ORCID: 0000-0002-2419-1943

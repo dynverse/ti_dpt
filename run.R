@@ -1,40 +1,35 @@
-library(jsonlite)
-library(readr)
-library(dplyr)
-library(purrr)
+#!/usr/local/bin/Rscript
 
-library(destiny)
+task <- dyncli::main()
 
-#   ____________________________________________________________________________
-#   Load data                                                               ####
+# load libraries
+library(dyncli, warn.conflicts = FALSE)
+library(dynwrap, warn.conflicts = FALSE)
+library(dplyr, warn.conflicts = FALSE)
+library(purrr, warn.conflicts = FALSE)
 
-data <- read_rds("/ti/input/data.rds")
-params <- jsonlite::read_json("/ti/input/params.json")
+library(destiny, warn.conflicts = FALSE)
 
-#' @examples
-#' data <- dyntoy::generate_dataset(model = "tree") %>% c(., .$prior_information)
-#' params <- yaml::read_yaml("containers/dpt/definition.yml")$parameters %>%
-#'   {.[names(.) != "forbidden"]} %>%
-#'   map(~ .$default)
-
-#   ____________________________________________________________________________
-#   Infer trajectory                                                        ####
-
-expression <- data$expression
+#####################################
+###           LOAD DATA           ###
+#####################################
+expression <- task$expression %>% as.matrix
+params <- task$params
+priors <- task$priors
 
 start_cell <-
-  if (!is.null(data$start_id)) {
-    sample(data$start_id, 1)
+  if (!is.null(priors$start_id)) {
+    sample(priors$start_id, 1)
   } else {
     NULL
   }
 
-# create n_local vector
-n_local <- seq(params$n_local_lower, params$n_local_upper, by = 1)
-
 # TIMING: done with preproc
-checkpoints <- list(method_afterpreproc = as.numeric(Sys.time()))
+timings <- list(method_afterpreproc = Sys.time())
 
+#####################################
+###        INFER TRAJECTORY       ###
+#####################################
 # run diffusion maps
 dm <- destiny::DiffusionMap(
   data = expression,
@@ -42,12 +37,12 @@ dm <- destiny::DiffusionMap(
   distance = params$distance,
   n_eigs = params$ndim,
   density_norm = params$density_norm,
-  n_local = n_local,
+  n_local = params$n_local,
   vars = params$features_id
 )
 
 # run DPT
-if (!is.null(data$start_cell)) {
+if (!is.null(start_cell)) {
   tips <- which(rownames(expression) %in% start_cell)
 } else {
   tips <- destiny::random_root(dm)
@@ -62,9 +57,12 @@ dpt <- destiny::DPT(
 tips <- destiny::tips(dpt)
 tip_names <- rownames(expression)[tips]
 
-# TIMING: done with method
-checkpoints$method_aftermethod <- as.numeric(Sys.time())
+# TIMING: done with trajectory inference
+timings$method_aftermethod <- Sys.time()
 
+#####################################
+###     SAVE OUTPUT TRAJECTORY    ###
+#####################################
 cell_ids <- rownames(expression)
 
 # construct grouping
@@ -120,19 +118,24 @@ dimred <- dm@eigenvectors %>%
   magrittr::set_colnames(., paste0("Comp", seq_len(ncol(.)))) %>%
   magrittr::set_rownames(cell_ids)
 
-# return output
-output <- lst(
-  cell_ids,
-  milestone_ids = group_ids,
-  milestone_network,
-  progressions,
-  group_ids,
-  grouping,
-  dimred,
-  timings = checkpoints
-)
+output <-
+  wrap_data(
+    cell_ids = cell_ids
+  ) %>%
+  add_grouping(
+    group_ids = group_ids,
+    grouping = grouping
+  ) %>%
+  add_trajectory(
+    milestone_ids = group_ids,
+    milestone_network = milestone_network,
+    progressions = progressions
+  ) %>% 
+  add_dimred(
+    dimred = dimred
+  ) %>%
+  add_timings(
+    timings = timings
+  )
 
-#   ____________________________________________________________________________
-#   Save output                                                             ####
-
-write_rds(output, "/ti/output/output.rds")
+dyncli::write_output(output, task$output)
