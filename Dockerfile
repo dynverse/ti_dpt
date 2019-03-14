@@ -4,6 +4,6 @@ ARG GITHUB_PAT
 
 RUN R -e 'devtools::install_cran("destiny")'
 
-COPY definition.yml run.R example.R /code/
+COPY definition.yml run.R example.sh /code/
 
 ENTRYPOINT ["/code/run.R"]
