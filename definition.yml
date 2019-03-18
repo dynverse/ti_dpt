@@ -75,7 +75,6 @@ parameters:
     default:
     - 5
     - 7
-    as_integer: TRUE
     lower_distribution:
       type: uniform
       lower: 2
