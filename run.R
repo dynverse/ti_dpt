@@ -14,7 +14,7 @@ library(destiny, warn.conflicts = FALSE)
 ###           LOAD DATA           ###
 #####################################
 expression <- task$expression %>% as.matrix
-params <- task$params
+parameters <- task$parameters
 priors <- task$priors
 
 start_cell <-
@@ -33,12 +33,12 @@ timings <- list(method_afterpreproc = Sys.time())
 # run diffusion maps
 dm <- destiny::DiffusionMap(
   data = expression,
-  sigma = params$sigma,
-  distance = params$distance,
-  n_eigs = params$ndim,
-  density_norm = params$density_norm,
-  n_local = params$n_local,
-  vars = params$features_id
+  sigma = parameters$sigma,
+  distance = parameters$distance,
+  n_eigs = parameters$ndim,
+  density_norm = parameters$density_norm,
+  n_local = parameters$n_local,
+  vars = parameters$features_id
 )
 
 # run DPT
@@ -49,7 +49,7 @@ if (!is.null(start_cell)) {
 }
 dpt <- destiny::DPT(
   dm,
-  w_width = params$w_width,
+  w_width = parameters$w_width,
   tips = tips
 )
 
