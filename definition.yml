@@ -36,7 +36,6 @@ wrapper:
   trajectory_types:
   - bifurcation
   - convergence
-  example: /code/example.R
   input_required: expression
   input_optional:
   - start_id
@@ -49,13 +48,7 @@ parameters:
     values:
     - local
     - global
-    description: |-
-      Diffusion scale parameter of the Gaussian kernel. A larger sigma might be necessary if the eigenvalues can not be found because of a singularity in the matrix. Must be one of:
-      \itemize{
-      \item A character vector: \code{"local"} (default) or \code{"global"},
-      \item a numeric global sigma -- a global sigma will be calculated using \code{\link[destiny:find_sigmas]{destiny::find_sigmas()}}
-      \item or a \code{\link[destiny:Sigmas-class]{destiny::Sigmas-class()}} object.
-      }
+    description: 'Diffusion scale parameter of the Gaussian kernel. A larger sigma might be necessary if the eigenvalues can not be found because of a singularity in the matrix. Must a character vector -- `"local"` (default) or `"global"`.'
   - id: distance
     type: character
     default: euclidean
@@ -63,13 +56,7 @@ parameters:
     - euclidean
     - cosine
     - rankcor
-    description: |-
-      A \code{\link[stats:dist]{stats::dist()}} object, or a character vector specifying which distance metric to use. Allowed measures:
-      \itemize{
-      \item Euclidean distance (default),
-      \item cosine distance (1-corr(c_1, c_2)), or
-      \item rank correlation distance (1-corr(rank(c_1), rank(c_2)))
-      }
+    description: 'A character vector specifying which distance metric to use. Allowed measures are the Euclidean distance (default), the cosine distance (`1-corr(c_1, c_2)`), or the rank correlation distance (`1-corr(rank(c_1), rank(c_2))`).'
   - id: ndim
     type: integer
     default: 20
@@ -83,13 +70,11 @@ parameters:
     default: yes
     description: logical. If TRUE, use density normalisation
   - id: n_local
-    description: If sigma == 'local', the \code{n_local}
-      nearest neighbor(s) determine(s) the local sigma
-    type: range
+    description: If sigma == 'local', the `n_local` nearest neighbor(s) determine(s) the local sigma
+    type: integer_range
     default:
     - 5
     - 7
-    as_integer: TRUE
     lower_distribution:
       type: uniform
       lower: 2

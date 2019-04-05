@@ -10,7 +10,7 @@ cache:
 services:
 - docker
 before_install:
-- openssl aes-256-cbc -K $encrypted_e08374958e2d_key -iv $encrypted_e08374958e2d_iv
+- openssl aes-256-cbc -K $encrypted_3746b2de3004_key -iv $encrypted_3746b2de3004_iv
   -in credentials.enc -out credentials -d
 - source credentials
 - source <(curl -sSL https://raw.githubusercontent.com/dynverse/travis_scripts/master/helper.sh)
@@ -19,7 +19,7 @@ install:
 - update_docker
 - install_hdf5
 - install_cran remotes
-- install_github_withdeps dynverse/dynwrap@singularity3 dynverse/dyntoy
+- install_github_withdeps dynverse/dynwrap dynverse/dyntoy
 script:
 - source version
 - build_docker

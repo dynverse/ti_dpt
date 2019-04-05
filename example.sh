@@ -11,8 +11,8 @@ data <- dyntoy::generate_dataset(
 )
 
 # add method specific args (if needed)
-data$params <- list()
-data$seed <- 1
+data$parameters <- list()
+data$seed <- 1L
 
 # write example dataset to file
 file <- commandArgs(trailingOnly = TRUE)[[1]]
